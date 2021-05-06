@@ -32,7 +32,7 @@ public class TurnBasedGameController
 
     public void UnitTurn(IUnit unit)
     {
-        unit.IsActing = true;
+        unit.GetTurn();
     }
 
     public void CrearActingState()
@@ -43,7 +43,7 @@ public class TurnBasedGameController
         }
     }
 
-    public void AddToUnits(IUnit unit)
+    public void AddToActingList(IUnit unit)
     {
         if (!_units.Contains(unit))
         {
@@ -51,7 +51,7 @@ public class TurnBasedGameController
         }
     }
     
-    public void RemoveFromUnits(IUnit unit)
+    public void RemoveFromActingList(IUnit unit)
     {
         if (_units.Contains(unit))
         {
