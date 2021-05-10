@@ -1,36 +1,40 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TurnBasedGameController
+public class TurnBasedGameController : IStateController
 {
-    private List<IUnit> _units;
+    private List<BaseUnitController> _units;
     private Camera _camera;
+    private InputController _inputController;
+    private BaseUnitController _currentMovingUnit;
 
-    private IUnit currentMovingUnit;
-
-    public TurnBasedGameController(List<IUnit> units, Camera camera)
+    public TurnBasedGameController(List<BaseUnitController> units, Camera camera, InputController inputController)
     {
         _units = units;
         _camera = camera;
-        FindWhosTurn(currentMovingUnit);
-        UnitTurn(currentMovingUnit);
+        _inputController = inputController;
+        _currentMovingUnit = FindWhosTurn(_units);
+        UnitTurn(_currentMovingUnit);
+        Debug.Log(_currentMovingUnit);
+        _inputController.GetActingUnit(_currentMovingUnit);
     }
 
-    public IUnit FindWhosTurn(IUnit currentUnit)
+    public BaseUnitController FindWhosTurn(List<BaseUnitController> baseUnits)
     {
+        BaseUnitController baseUnit = baseUnits[0];
         var maxInitiative = 0;
-        foreach (var unit in _units)
+        foreach (var unit in baseUnits)
         {
-            if (unit.Initiative > maxInitiative && !unit.IsAlreadyActed)
+            if (unit.UnitModel.Initiative > maxInitiative && !unit.UnitModel.IsAlreadyActed)
             {
-                maxInitiative = unit.Initiative;
-                currentUnit = unit;
+                maxInitiative = unit.UnitModel.Initiative;
+                baseUnit = unit;
             }
         }
-        return currentUnit;
+        return baseUnit;
     }
 
-    public void UnitTurn(IUnit unit)
+    public void UnitTurn(BaseUnitController unit)
     {
         unit.GetTurn();
     }
@@ -39,11 +43,11 @@ public class TurnBasedGameController
     {
         foreach (var unit in _units)
         {
-            unit.IsAlreadyActed = false;
+            unit.UnitModel.IsAlreadyActed = false;
         }
     }
 
-    public void AddToActingList(IUnit unit)
+    public void AddToActingList(BaseUnitController unit)
     {
         if (!_units.Contains(unit))
         {
@@ -51,7 +55,7 @@ public class TurnBasedGameController
         }
     }
     
-    public void RemoveFromActingList(IUnit unit)
+    public void RemoveFromActingList(BaseUnitController unit)
     {
         if (_units.Contains(unit))
         {

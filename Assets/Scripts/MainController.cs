@@ -11,15 +11,17 @@ public class MainController : MonoBehaviour
 
     private InputController _inputController;
     private TurnBasedGameController _turnBasedGameController;
+    private IStateController _currentStateController;
 
-    private List<IUnit> _units = new List<IUnit>();
+    [SerializeField] private List<BaseUnitController> _units = new List<BaseUnitController>();
 
-    private void Awake()
+    private void Start()
     {
-        ChangeGameState(_gameState);
         _mainCamera = Camera.main;
-        _inputController = new InputController();
+        _inputController = new InputController(_mainCamera);
         UpdateManager.AddToUpdate(_inputController);
+        _units.Add(UnitFactory.CreateUnit(PlayerUnitType.Infantry));
+        ChangeGameState(_gameState);
     }
 
     private void Update()
@@ -32,7 +34,11 @@ public class MainController : MonoBehaviour
         switch(gameState)
         {
             case GameState.Battle:
-                _turnBasedGameController = new TurnBasedGameController(_units, _mainCamera);
+                if (_turnBasedGameController == null)
+                {
+                    _turnBasedGameController = new TurnBasedGameController(_units, _mainCamera, _inputController);
+                }
+                _currentStateController = _turnBasedGameController;
                 break;
             case GameState.Exploring:
                 break;
