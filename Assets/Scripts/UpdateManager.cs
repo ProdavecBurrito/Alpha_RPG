@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 
 public static class UpdateManager
 {
-    private static List<IUpdate> _updates;
+    private static event Action OnUpdateEvent = delegate () { };
+
+    private static List<IUpdate> _updates = new List<IUpdate>();
     public static List<IUpdate> Updates => _updates;
 
     public static void AddToUpdate(IUpdate update)
@@ -24,5 +27,17 @@ public static class UpdateManager
         {
             _updates[i].UpdateTick();
         }
+        OnUpdateEvent.Invoke();
+    }
+
+    public static void SubscribeToUpdate(Action action)
+    {
+        
+        OnUpdateEvent += action;
+    }
+
+    public static void UnsubscribefromUpdate(Action action)
+    {
+        OnUpdateEvent -= action;
     }
 }
