@@ -13,36 +13,58 @@ public class TurnBasedGameController : IStateController
         _units = units;
         _camera = camera;
         _inputController = inputController;
-        _currentMovingUnit = FindWhosTurn(_units);
-        UnitTurn(_currentMovingUnit);
-        Debug.Log(_currentMovingUnit);
-        _inputController.GetActingUnit(_currentMovingUnit);
+        OnUnitTurnEnd();
+        foreach (var unit in _units)
+        {
+            unit.OnTurnEnd += OnUnitTurnEnd;
+        }
     }
 
-    public BaseUnitController FindWhosTurn(List<BaseUnitController> baseUnits)
+    public BaseUnitController FindWhosTurn()
     {
-        BaseUnitController baseUnit = baseUnits[0];
-        var maxInitiative = 0;
-        foreach (var unit in baseUnits)
+        var unitsCount = 0;
+        foreach (var unit in _units)
         {
-            if (unit.UnitModel.Initiative > maxInitiative && !unit.UnitModel.IsAlreadyActed)
+            if (unit.IsActed())
+            {
+                unitsCount++;
+            }
+        }
+        if (unitsCount == _units.Count)
+        {
+            ClearActingState();
+        }
+
+        BaseUnitController baseUnit = _units[0];
+        var maxInitiative = 0;
+        foreach (var unit in _units)
+        {
+            if (unit.UnitModel.Initiative > maxInitiative && !unit.IsActed())
             {
                 maxInitiative = unit.UnitModel.Initiative;
                 baseUnit = unit;
             }
         }
+        UnitTurn(baseUnit);
         return baseUnit;
     }
 
     public void UnitTurn(BaseUnitController unit)
     {
         unit.GetTurn();
+        _inputController.GetActingUnit(unit);
     }
 
-    public void CrearActingState()
+    public void OnUnitTurnEnd()
+    {
+        _currentMovingUnit = FindWhosTurn();
+    }
+
+    public void ClearActingState()
     {
         foreach (var unit in _units)
         {
+            Debug.Log("A");
             unit.UnitModel.IsAlreadyActed = false;
         }
     }

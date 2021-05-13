@@ -1,12 +1,13 @@
-﻿
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 
 public class PlayerInfantryView : BaseUnitView
 {
     private void Awake()
     {
-        _animator = GetComponent<Animator>();
-        _navMeshAgent = GetComponent<NavMeshAgent>();
+        OnSelected(false);
+        _unitAnimator = GetComponentInChildren<Animator>();
+        _unitNavMeshAgent = GetComponent<NavMeshAgent>();
+        _unitTransform = GetComponent<Transform>();
     }
 }

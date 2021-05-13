@@ -1,31 +1,34 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 public class InputController : IUpdate
 {
     private RaycastHit _raycastHit;
     private Ray _ray;
-    private IUnitController _unit;
+    private BaseUnitController _unit;
     private Camera _mainCamera;
-    LayerMask _layerMask;
-    LayerMask _ground;
+    private CameraController _cameraController;
+    LayerMask _unitMask;
+    LayerMask _groundMask;
 
     public InputController(Camera camera)
     {
-        _layerMask = LayerMask.GetMask("Unit");
-        _ground = LayerMask.GetMask("Ground");
-        Debug.Log(_ground.value);
+        _unitMask = LayerMask.GetMask("Unit");
+        _groundMask = LayerMask.GetMask("Ground");
         _mainCamera = camera;
+        _cameraController = new CameraController(_mainCamera);
     }
 
-    public void GetActingUnit(IUnitController unitController)
+    public void GetActingUnit(BaseUnitController unitController)
     {
         _unit = unitController;
-        Debug.Log(_unit);
+        _cameraController.AssignFollowing(_unit.UnitView.transform);
     }
 
     public void UpdateTick()
     {
         MouseControll();
+        RotateCamera();
     }
 
     private void MouseControll()
@@ -34,15 +37,42 @@ public class InputController : IUpdate
         {
             if (_unit != null)
             {
-                Debug.Log("2");
                 _ray = _mainCamera.ScreenPointToRay(Input.mousePosition);
-                Debug.DrawRay(_ray.origin, _ray.direction * 10, Color.yellow);
-                if (Physics.Raycast(_ray, out _raycastHit, 100, _ground))
+                if (Physics.Raycast(_ray, out _raycastHit, 100, _groundMask))
                 {
-                    Debug.Log("3");
                     _unit.Move(_raycastHit.point);
                 }
             }
+        }
+    }
+
+    public void RotateCamera()
+    {
+        RotateToRight();
+        RotateToLeft();
+    }
+
+    private void RotateToLeft()
+    {
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            UpdateManager.SubscribeToUpdate(_cameraController.RotateToLeft);
+        }
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            UpdateManager.UnsubscribefromUpdate(_cameraController.RotateToLeft);
+        }
+    }
+
+    private void RotateToRight()
+    {
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            UpdateManager.SubscribeToUpdate(_cameraController.RotateToRight);
+        }
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            UpdateManager.UnsubscribefromUpdate(_cameraController.RotateToRight);
         }
     }
 }

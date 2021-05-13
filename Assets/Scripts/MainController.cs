@@ -11,6 +11,7 @@ public class MainController : MonoBehaviour
 
     private InputController _inputController;
     private TurnBasedGameController _turnBasedGameController;
+
     private IStateController _currentStateController;
 
     [SerializeField] private List<BaseUnitController> _units = new List<BaseUnitController>();
@@ -20,6 +21,7 @@ public class MainController : MonoBehaviour
         _mainCamera = Camera.main;
         _inputController = new InputController(_mainCamera);
         UpdateManager.AddToUpdate(_inputController);
+        _units.Add(UnitFactory.CreateUnit(PlayerUnitType.Infantry));
         _units.Add(UnitFactory.CreateUnit(PlayerUnitType.Infantry));
         ChangeGameState(_gameState);
     }

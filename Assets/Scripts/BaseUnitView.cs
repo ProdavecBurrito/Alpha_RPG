@@ -3,8 +3,18 @@ using UnityEngine;
 
 public abstract class BaseUnitView : MonoBehaviour
 {
-    protected Animator _animator;
-    protected NavMeshAgent _navMeshAgent;
-    protected Transform _transform;
-    public NavMeshAgent NavMeshAgent => _navMeshAgent;
+    [SerializeField] private GameObject _selected;
+
+    protected Animator _unitAnimator;
+    protected NavMeshAgent _unitNavMeshAgent;
+    protected Transform _unitTransform;
+
+    public NavMeshAgent UnitNavMeshAgent => _unitNavMeshAgent;
+    public Animator UnitAnimator => _unitAnimator;
+    public Transform UnitTransform => _unitTransform;
+
+    public void OnSelected(bool isSelected)
+    {
+        _selected.SetActive(isSelected);
+    }
 }
