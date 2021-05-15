@@ -64,7 +64,6 @@ public class TurnBasedGameController : IStateController
     {
         foreach (var unit in _units)
         {
-            Debug.Log("A");
             unit.UnitModel.IsAlreadyActed = false;
         }
     }

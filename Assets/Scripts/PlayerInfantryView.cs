@@ -5,9 +5,11 @@ public class PlayerInfantryView : BaseUnitView
 {
     private void Awake()
     {
-        OnSelected(false);
         _unitAnimator = GetComponentInChildren<Animator>();
         _unitNavMeshAgent = GetComponent<NavMeshAgent>();
+        _path = new NavMeshPath();
+        _meshObstacle = GetComponent<NavMeshObstacle>();
         _unitTransform = GetComponent<Transform>();
+        OnSelected(false);
     }
 }

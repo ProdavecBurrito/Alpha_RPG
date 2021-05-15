@@ -23,6 +23,7 @@ public abstract class BaseUnitController : IUnitController
        _unitModel.IsActing = true;
         _unitModel.CurrentActionPoints = _unitModel.StartActionPoints;
         _unitView.OnSelected(true);
+        UpdateManager.SubscribeToUpdate(CheckSpeed);
     }
 
     public virtual void EndTurn()
@@ -30,12 +31,23 @@ public abstract class BaseUnitController : IUnitController
        _unitModel.IsAlreadyActed = true;
         _unitView.OnSelected(false);
         OnTurnEnd.Invoke();
+        UpdateManager.UnsubscribefromUpdate(CheckSpeed);
     }
 
     public virtual void Move(Vector3 direction)
     {
         _unitView.UnitNavMeshAgent.SetDestination(direction);
-        ReduceActionPoints(_unitModel.MovementPointsValue);
+        UpdateManager.SubscribeToUpdate(CheckPath);
+    }
+
+    public void CheckPath()
+    {
+        var dist = Vector3.Distance(_unitView.gameObject.transform.position, _unitView.UnitNavMeshAgent.destination);
+        if(dist <= _unitView.UnitNavMeshAgent.stoppingDistance)
+        {
+            ReduceActionPoints(_unitModel.MovementPointsValue);
+            UpdateManager.UnsubscribefromUpdate(CheckPath);
+        }
     }
 
     public virtual void Attack()
@@ -55,6 +67,7 @@ public abstract class BaseUnitController : IUnitController
         {
             _unitModel.CurrentActionPoints = 0;
         }
+        Debug.Log(_unitModel.CurrentActionPoints);
         CheckEndTurn(_unitModel.CurrentActionPoints);
     }
 
